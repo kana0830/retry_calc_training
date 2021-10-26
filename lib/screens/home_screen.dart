@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:retry_calc_training/screens/test_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -6,8 +7,32 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   List<DropdownMenuItem<int>> _menuItems = [];
+  int _numberOfQuestions = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    setMenuItems();
+    _numberOfQuestions = _menuItems[0].value!;
+  }
+
+  void setMenuItems() {
+    _menuItems
+      ..add(DropdownMenuItem(
+        value: 10,
+        child: Text("10"),
+      ))
+      ..add(DropdownMenuItem(
+        value: 20,
+        child: Text("20"),
+      ))
+      ..add(DropdownMenuItem(
+        value: 30,
+        child: Text("30"),
+      ));
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
@@ -30,14 +55,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 70.0,
                 ),
-                // TODO
+                DropdownButton(
+                  items: _menuItems,
+                  value: _numberOfQuestions,
+                  onChanged: (int? selectedValue) {
+                    setState(() {
+                      _numberOfQuestions = selectedValue!;
+                    });
+                  },
+                ),
                 Expanded(
                   child: Container(
                     alignment: Alignment.bottomCenter,
                     //padding: EdgeInsets.only(bottom: 12.0),
                     child: ElevatedButton.icon(
                       icon: Icon(Icons.skip_next),
-                      onPressed: () => print("おしたで〜"), //TODO
+                      onPressed: () => startTestScreen(context),
                       style: ElevatedButton.styleFrom(
                           primary: Colors.brown,
                           onPrimary: Colors.white,
@@ -56,5 +89,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
+  startTestScreen(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                TestScreen(numberOfQuestions: _numberOfQuestions)));
+  }
 }
