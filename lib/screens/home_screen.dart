@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     //padding: EdgeInsets.only(bottom: 12.0),
                     child: ElevatedButton.icon(
                       icon: Icon(Icons.skip_next),
-                      onPressed: () => startTestScreen(context),
+                      onPressed: () => startTestScreen(),
                       style: ElevatedButton.styleFrom(
                           primary: Colors.brown,
                           onPrimary: Colors.white,
@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  startTestScreen(BuildContext context) {
+  startTestScreen() {
     Navigator.push(
         context,
         MaterialPageRoute(
