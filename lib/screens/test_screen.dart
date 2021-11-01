@@ -14,6 +14,11 @@ class _TestScreenState extends State<TestScreen> {
   int numberOfCorrect = 0;
   int correctRate = 0;
 
+  int questionLeft = 0;
+  int questionRight = 0;
+  String operator = "";
+  String answerString = "";
+
   //@override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -25,7 +30,7 @@ class _TestScreenState extends State<TestScreen> {
                 //スコア表示部分
                 _scorePart(),
                 //問題表示部分
-                //_questionPart(),
+                _questionPart(),
                 //電卓ボタン部分
                 //_calcButtons(),
                 //答え合わせボタン
@@ -86,7 +91,60 @@ class _TestScreenState extends State<TestScreen> {
   }
 
   //問題表示部分
-  //Widget _questionPart() {}
+  Widget _questionPart() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 80.0),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Center(
+              child: Text(
+                questionLeft.toString(),
+                style: TextStyle(fontSize: 36.0),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Center(
+              child: Text(
+                operator,
+                style: TextStyle(fontSize: 30.0),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Center(
+              child: Text(
+                questionRight.toString(),
+                style: TextStyle(fontSize: 36.0),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Center(
+              child: Text(
+                "=",
+                style: TextStyle(fontSize: 30.0),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Center(
+              child: Text(
+                answerString,
+                style: TextStyle(fontSize: 60.0),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   //電卓ボタン部分
   //Widget _calcButtons() {}
