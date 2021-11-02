@@ -32,11 +32,11 @@ class _TestScreenState extends State<TestScreen> {
                 //問題表示部分
                 _questionPart(),
                 //電卓ボタン部分
-                //_calcButtons(),
+                _calcButtons(),
                 //答え合わせボタン
-                //_answerCheckButton(),
+                _answerCheckButton(),
                 //戻るボタン
-                //_backButton()
+                _backButton()
               ],
             ),
           ],
@@ -147,14 +147,85 @@ class _TestScreenState extends State<TestScreen> {
   }
 
   //電卓ボタン部分
-  //Widget _calcButtons() {}
+  Widget _calcButtons() {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 80.0),
+        child: Table(
+          children: [
+            TableRow(children: [
+              _calcButton("7"),
+              _calcButton("8"),
+              _calcButton("9"),
+            ]),
+            TableRow(children: [
+              _calcButton("4"),
+              _calcButton("5"),
+              _calcButton("6"),
+            ]),
+            TableRow(children: [
+              _calcButton("1"),
+              _calcButton("2"),
+              _calcButton("3"),
+            ]),
+            TableRow(children: [
+              _calcButton("0"),
+              _calcButton("-"),
+              _calcButton("C"),
+            ]),
+          ],
+        ),
+      ),
+    );
+  }
 
-  //Widget _calcButton(String numString) {}
+  Widget _calcButton(String numString) {
+    return Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(primary: Colors.brown),
+        onPressed: () => print(numString), //TODO
+        child: Text(
+          numString,
+          style: TextStyle(fontSize: 24.0),
+        ),
+      ),
+    );
+  }
 
   //答え合わせボタン
-  //Widget _answerCheckButton() {}
+  Widget _answerCheckButton() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          //TODO 答え合わせボタン
+          onPressed: null,
+          child: Text(
+            "こたえあわせ",
+            style: TextStyle(fontSize: 14.0),
+          ),
+        ),
+      ),
+    );
+  }
 
   //戻るボタン
-  //Widget _backButton() {}
-
+  Widget _backButton() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          //TODO
+          onPressed: null,
+          child: Text(
+            "もどる",
+            style: TextStyle(fontSize: 14.0),
+          ),
+        ),
+      ),
+    );
+  }
 }
