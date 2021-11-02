@@ -237,7 +237,7 @@ class _TestScreenState extends State<TestScreen> {
       padding: const EdgeInsets.all(2.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(primary: Colors.brown),
-        onPressed: () => print(numString), //TODO
+        onPressed: () => inputAnswer(numString),
         child: Text(
           numString,
           style: TextStyle(fontSize: 24.0),
@@ -323,5 +323,28 @@ class _TestScreenState extends State<TestScreen> {
       operator = "-";
     }
     setState(() {});
+  }
+
+  inputAnswer(String numString) {
+    setState(() {
+      if (numString == "C") {
+        answerString = "";
+        return;
+      }
+      if (numString == "-") {
+        if (answerString == "") answerString = "-";
+        return;
+      }
+      if (numString == "0") {
+        if (answerString != "0" && answerString != "-")
+          answerString = answerString + numString;
+        return;
+      }
+      if (answerString == "0") {
+        answerString = numString;
+        return;
+      }
+      answerString = answerString + numString;
+    });
   }
 }
