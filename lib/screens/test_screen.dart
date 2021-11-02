@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,6 +27,12 @@ class _TestScreenState extends State<TestScreen> {
   late Soundpool soundpool;
   int soundIdCorrect = 0;
   int soundIdInCorrect = 0;
+
+  bool isCalcButtonEnable = false;
+  bool isAnswerCheckButtonEnable = false;
+  bool isBackButtonEnable = false;
+  bool isCorrectInCorrectEnable = false;
+  bool isEndMessageEnable = false;
 
   @override
   void initState() {
@@ -277,21 +284,44 @@ class _TestScreenState extends State<TestScreen> {
 
   //TODO ○×画像
   Widget _correctIncorrectImage() {
-    return Center(child: Image.asset("assets/images/pic_correct.png"));
+    if (isCorrectInCorrectEnable == true) {
+      return Center(child: Image.asset("assets/images/pic_correct.png"));
+    } else {
+      return Container();
+    }
   }
 
   //テスト終了メッセージ
   Widget _endMessage() {
-    return Center(
-      child: Text(
-        "テスト終了",
-        style: TextStyle(fontSize: 80.0),
-      ),
-    );
+    if (isEndMessageEnable) {
+      return Center(
+        child: Text(
+          "テスト終了",
+          style: TextStyle(fontSize: 80.0),
+        ),
+      );
+    } else {
+      return Container();
+    }
   }
 
-  //TODO
-  Widget setQuestion() {
-    return Container();
+  //問題出題部分
+  void setQuestion() {
+    isCalcButtonEnable = true;
+    isAnswerCheckButtonEnable = true;
+    isBackButtonEnable = false;
+    isCorrectInCorrectEnable = false;
+    isEndMessageEnable = false;
+
+    Random random = Random();
+    questionLeft = random.nextInt(100) + 1;
+    questionRight = random.nextInt(100) + 1;
+
+    if (random.nextInt(2) + 1 == 1) {
+      operator = "+";
+    } else {
+      operator = "-";
+    }
+    setState(() {});
   }
 }
