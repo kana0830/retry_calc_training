@@ -43,8 +43,8 @@ class _TestScreenState extends State<TestScreen> {
   void initSounds() async {
     try {
       soundpool = Soundpool.fromOptions();
-      soundIdCorrect = await loadSound("assets/sounds/sounds_correct.mp3");
-      soundIdInCorrect = await loadSound("assets/sounds/sounds_incorrect.mp3");
+      soundIdCorrect = await loadSound("assets/sounds/sound_correct.mp3");
+      soundIdInCorrect = await loadSound("assets/sounds/sound_incorrect.mp3");
       setState(() {});
     } on IOException catch (error) {
       print("エラーの内容は：$error");
