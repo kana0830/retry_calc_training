@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -24,24 +25,25 @@ class _TestScreenState extends State<TestScreen> {
   String operator = "";
   String answerString = "";
 
+  //null safety（ツッコミマシーン同様lateでやる）
   late Soundpool soundpool;
   int soundIdCorrect = 0;
   int soundIdInCorrect = 0;
 
-  bool isCalcButtonEnable = false;
-  bool isAnswerCheckButtonEnable = false;
-  bool isBackButtonEnable = false;
-  bool isCorrectInCorrectEnable = false;
-  bool isEndMessageEnable = false;
+  bool isCalcButtonsEnabled = false;
+  bool isAnswerCheckButtonEnabled = false;
+  bool isBackButtonEnabled = false;
+  bool isCorrectInCorrectImageEnabled = false;
+  bool isEndMessageEnabled = false;
+  bool isCorrect = false;
 
-  @override
+  //@override
   void initState() {
     super.initState();
     numberOfCorrect = 0;
     correctRate = 0;
     numberOfRemaining = widget.numberOfQuestions;
 
-    //効果音
     initSounds();
 
     setQuestion();
@@ -50,6 +52,8 @@ class _TestScreenState extends State<TestScreen> {
   void initSounds() async {
     try {
       soundpool = Soundpool.fromOptions();
+      //soundpool = Soundpool();
+
       soundIdCorrect = await loadSound("assets/sounds/sound_correct.mp3");
       soundIdInCorrect = await loadSound("assets/sounds/sound_incorrect.mp3");
       setState(() {});
@@ -68,7 +72,7 @@ class _TestScreenState extends State<TestScreen> {
     soundpool.release();
   }
 
-  @override
+  //@override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -88,9 +92,9 @@ class _TestScreenState extends State<TestScreen> {
                 _backButton()
               ],
             ),
-            //○×画像
+            //○・☓画像
             _correctIncorrectImage(),
-            //_テスト終了メッセージ
+            //テスト終了メッセージ
             _endMessage(),
           ],
         ),
@@ -148,52 +152,48 @@ class _TestScreenState extends State<TestScreen> {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 80.0),
       child: Row(
-        children: [
+        children: <Widget>[
           Expanded(
-            flex: 2,
-            child: Center(
-              child: Text(
-                questionLeft.toString(),
-                style: TextStyle(fontSize: 36.0),
-              ),
-            ),
-          ),
+              flex: 2,
+              child: Center(
+                child: Text(
+                  questionLeft.toString(),
+                  style: TextStyle(fontSize: 36.0),
+                ),
+              )),
           Expanded(
-            flex: 1,
-            child: Center(
-              child: Text(
-                operator,
-                style: TextStyle(fontSize: 30.0),
-              ),
-            ),
-          ),
+              flex: 1,
+              child: Center(
+                child: Text(
+                  operator,
+                  style: TextStyle(fontSize: 30.0),
+                ),
+              )),
           Expanded(
-            flex: 2,
-            child: Center(
-              child: Text(
-                questionRight.toString(),
-                style: TextStyle(fontSize: 36.0),
-              ),
-            ),
-          ),
+              flex: 2,
+              child: Center(
+                child: Text(
+                  questionRight.toString(),
+                  style: TextStyle(fontSize: 36.0),
+                ),
+              )),
           Expanded(
-            flex: 1,
-            child: Center(
-              child: Text(
-                "=",
-                style: TextStyle(fontSize: 30.0),
-              ),
-            ),
-          ),
+              flex: 1,
+              child: Center(
+                child: Text(
+                  "=",
+                  style: TextStyle(fontSize: 30.0),
+                ),
+              )),
           Expanded(
-            flex: 3,
-            child: Center(
-              child: Text(
-                answerString,
-                style: TextStyle(fontSize: 60.0),
-              ),
-            ),
-          ),
+              flex: 3,
+              child: Center(
+                child: Text(
+                  answerString,
+                  maxLines: 1,
+                  style: TextStyle(fontSize: 60.0),
+                ),
+              )),
         ],
       ),
     );
@@ -203,7 +203,7 @@ class _TestScreenState extends State<TestScreen> {
   Widget _calcButtons() {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 80.0),
+        padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 50.0),
         child: Table(
           children: [
             TableRow(children: [
@@ -236,12 +236,14 @@ class _TestScreenState extends State<TestScreen> {
     return Padding(
       padding: const EdgeInsets.all(2.0),
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(primary: Colors.brown),
-        onPressed: () => inputAnswer(numString),
+        style: ElevatedButton.styleFrom(
+          primary: Colors.brown,
+        ),
         child: Text(
           numString,
           style: TextStyle(fontSize: 24.0),
         ),
+        onPressed: isCalcButtonsEnabled ? () => inputAnswer(numString) : null,
       ),
     );
   }
@@ -253,8 +255,10 @@ class _TestScreenState extends State<TestScreen> {
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          //TODO 答え合わせボタン
-          onPressed: null,
+          style: ElevatedButton.styleFrom(
+            primary: Colors.brown,
+          ),
+          onPressed: isCalcButtonsEnabled ? () => answerCheck() : null,
           child: Text(
             "こたえあわせ",
             style: TextStyle(fontSize: 14.0),
@@ -271,8 +275,10 @@ class _TestScreenState extends State<TestScreen> {
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          //TODO
-          onPressed: null,
+          style: ElevatedButton.styleFrom(
+            primary: Colors.brown,
+          ),
+          onPressed: isBackButtonEnabled ? () => closeTestScreen() : null, //
           child: Text(
             "もどる",
             style: TextStyle(fontSize: 14.0),
@@ -282,10 +288,13 @@ class _TestScreenState extends State<TestScreen> {
     );
   }
 
-  //TODO ○×画像
+  //○・バツ画像
   Widget _correctIncorrectImage() {
-    if (isCorrectInCorrectEnable == true) {
-      return Center(child: Image.asset("assets/images/pic_correct.png"));
+    if (isCorrectInCorrectImageEnabled == true) {
+      if (isCorrect) {
+        return Center(child: Image.asset("assets/images/pic_correct.png"));
+      }
+      return Center(child: Image.asset("assets/images/pic_incorrect.png"));
     } else {
       return Container();
     }
@@ -293,25 +302,26 @@ class _TestScreenState extends State<TestScreen> {
 
   //テスト終了メッセージ
   Widget _endMessage() {
-    if (isEndMessageEnable) {
+    if (isEndMessageEnabled) {
       return Center(
-        child: Text(
-          "テスト終了",
-          style: TextStyle(fontSize: 80.0),
-        ),
-      );
+          child: Text(
+        "テスト終了",
+        style: TextStyle(fontSize: 60.0),
+      ));
     } else {
       return Container();
     }
   }
 
-  //問題出題部分
+  //問題を出す
   void setQuestion() {
-    isCalcButtonEnable = true;
-    isAnswerCheckButtonEnable = true;
-    isBackButtonEnable = false;
-    isCorrectInCorrectEnable = false;
-    isEndMessageEnable = false;
+    isCalcButtonsEnabled = true;
+    isAnswerCheckButtonEnabled = true;
+    isBackButtonEnabled = false;
+    isCorrectInCorrectImageEnabled = false;
+    isEndMessageEnabled = false;
+    isCorrect = false;
+    answerString = "";
 
     Random random = Random();
     questionLeft = random.nextInt(100) + 1;
@@ -322,10 +332,12 @@ class _TestScreenState extends State<TestScreen> {
     } else {
       operator = "-";
     }
+
     setState(() {});
   }
 
   inputAnswer(String numString) {
+    //早期リターンを使う場合
     setState(() {
       if (numString == "C") {
         answerString = "";
@@ -346,5 +358,74 @@ class _TestScreenState extends State<TestScreen> {
       }
       answerString = answerString + numString;
     });
+
+    //普通のif文
+//    setState(() {
+//      if (numString == "C"){
+//        answerString = "";
+//      } else if (numString == "-"){
+//        if(answerString == "") answerString = "-";
+//      } else if (numString == "0"){
+//        if (answerString != "0" && answerString != "-")
+//          answerString = answerString + numString;
+//      } else if (answerString == "0"){
+//        answerString = numString;
+//      } else {
+//        answerString = answerString + numString;
+//      }
+//    });
+  }
+
+  answerCheck() {
+    if (answerString == "" || answerString == "-") {
+      return;
+    }
+
+    isCalcButtonsEnabled = false;
+    isAnswerCheckButtonEnabled = false;
+    isBackButtonEnabled = false;
+    isCorrectInCorrectImageEnabled = true;
+    isEndMessageEnabled = false;
+
+    numberOfRemaining -= 1;
+
+    var myAnswer = int.parse(answerString).toInt();
+    var realAnswer = 0;
+    if (operator == "+") {
+      realAnswer = questionLeft + questionRight;
+    } else {
+      realAnswer = questionLeft - questionRight;
+    }
+
+    if (myAnswer == realAnswer) {
+      isCorrect = true;
+      soundpool.play(soundIdCorrect);
+      numberOfCorrect += 1;
+    } else {
+      isCorrect = false;
+      soundpool.play(soundIdInCorrect);
+    }
+
+    correctRate =
+        (numberOfCorrect / (widget.numberOfQuestions - numberOfRemaining) * 100)
+            .toInt();
+
+    if (numberOfRemaining == 0) {
+      //残り問題数がないとき〜
+      isCalcButtonsEnabled = false;
+      isAnswerCheckButtonEnabled = false;
+      isBackButtonEnabled = true;
+      isCorrectInCorrectImageEnabled = true;
+      isEndMessageEnabled = true;
+    } else {
+      //残り問題数があるとき〜
+      Timer(Duration(seconds: 1), () => setQuestion());
+    }
+
+    setState(() {});
+  }
+
+  closeTestScreen() {
+    Navigator.pop(context);
   }
 }
