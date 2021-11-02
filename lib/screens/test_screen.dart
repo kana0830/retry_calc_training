@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:soundpool/soundpool.dart';
 
 class TestScreen extends StatefulWidget {
   final int numberOfQuestions;
@@ -19,7 +23,45 @@ class _TestScreenState extends State<TestScreen> {
   String operator = "";
   String answerString = "";
 
-  //@override
+  late Soundpool soundpool;
+  int soundIdCorrect = 0;
+  int soundIdInCorrect = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    numberOfCorrect = 0;
+    correctRate = 0;
+    numberOfRemaining = widget.numberOfQuestions;
+
+    //効果音
+    initSounds();
+
+    setQuestion();
+  }
+
+  void initSounds() async {
+    try {
+      soundpool = Soundpool.fromOptions();
+      soundIdCorrect = await loadSound("assets/sounds/sounds_correct.mp3");
+      soundIdInCorrect = await loadSound("assets/sounds/sounds_incorrect.mp3");
+      setState(() {});
+    } on IOException catch (error) {
+      print("エラーの内容は：$error");
+    }
+  }
+
+  Future<int> loadSound(String soundPath) {
+    return rootBundle.load(soundPath).then((value) => soundpool.load(value));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    soundpool.release();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -39,6 +81,10 @@ class _TestScreenState extends State<TestScreen> {
                 _backButton()
               ],
             ),
+            //○×画像
+            _correctIncorrectImage(),
+            //_テスト終了メッセージ
+            _endMessage(),
           ],
         ),
       ),
@@ -227,5 +273,25 @@ class _TestScreenState extends State<TestScreen> {
         ),
       ),
     );
+  }
+
+  //TODO ○×画像
+  Widget _correctIncorrectImage() {
+    return Center(child: Image.asset("assets/images/pic_correct.png"));
+  }
+
+  //テスト終了メッセージ
+  Widget _endMessage() {
+    return Center(
+      child: Text(
+        "テスト終了",
+        style: TextStyle(fontSize: 80.0),
+      ),
+    );
+  }
+
+  //TODO
+  Widget setQuestion() {
+    return Container();
   }
 }
